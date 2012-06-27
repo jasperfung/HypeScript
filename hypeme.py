@@ -57,7 +57,7 @@ class HypeScraper:
 		
 	def start(self):
 		for i in range(1, NUMBER_OF_PAGES + 1):
-			complete_url = self.url + "/" + str(i) + '?ax=1&ts='+ str(time.time())
+			complete_url = self.url + str(i) + '?ax=1&ts='+ str(time.time())
 			request = urllib2.Request(complete_url)
 			response = urllib2.urlopen(request)
 			#save our cookie
@@ -80,7 +80,7 @@ class HypeScraper:
 		while len( self.songs ) > 0:
 			current_song = self.songs.popleft()
 			
-			print "Attempting to download ", current_song
+			print "Attempting to download ("+current_song.artist+" - "+current_song.title+")"
 			
 			if self.song_exists( current_song ):
 				print "\tSong existed!"
@@ -107,7 +107,7 @@ class HypeScraper:
 		#grab the data
 		song_data = response.read()
 		try:
-			mp3_song = open(song.title+".mp3", "wb")
+			mp3_song = open(song.artist+" - "+song.title+".mp3", "wb")
 			mp3_song.write(song_data)
 			mp3_song.close()
 		except Exception as e:
@@ -131,8 +131,8 @@ class HypeScraper:
 	def parse_html(self, html_contents):
 		idMatches = re.findall("[ \t]id:\'(\w*)(?=\')", html_contents)
 		keyMatches = re.findall("(?<=\tkey: \')\w*(?=\')", html_contents)
-		songMatches= re.findall("(?<=\tsong:\').*(?=\')", html_contents)
-		artistMatches= re.findall("(?<=\tartist:\').*(?=\')", html_contents)
+		songMatches= re.findall("(?<= song:\').*(?=\')", html_contents)
+		artistMatches= re.findall("(?<= artist:\').*(?=\')", html_contents)
 		
 		for i in range( len(idMatches) ):
 			id = idMatches[i]
